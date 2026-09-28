@@ -3,16 +3,11 @@ import { fileURLToPath } from 'node:url';
 
 const serverDirectory = fileURLToPath(new URL('../', import.meta.url));
 const clientDirectory = fileURLToPath(new URL('../../client/', import.meta.url));
-const demo = process.argv.includes('--demo');
 const env = {
   ...process.env,
-  ...(demo
-    ? {
-        DEMO_MODE: 'true',
-        KAFKA_BROKERS: 'localhost:19092',
-        REDIS_URL: 'redis://127.0.0.1:16379',
-      }
-    : {}),
+  DEMO_MODE: process.env.DEMO_MODE || 'true',
+  KAFKA_BROKERS: process.env.KAFKA_BROKERS || 'localhost:19092',
+  REDIS_URL: process.env.REDIS_URL || 'redis://127.0.0.1:16379',
 };
 const children = new Set();
 let closing = false;
