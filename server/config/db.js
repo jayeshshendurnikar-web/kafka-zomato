@@ -96,23 +96,3 @@ export const getMongoClient = () => {
   return mongoClient;
 };
 
-export const dbHelpers = {
-  async healthCheck() {
-    try {
-      const client = getMongoClient();
-      if (
-        !client ||
-        !client.connection ||
-        !client.connection.readyState ||
-        !client.connection?.db
-      ) {
-        return false;
-      }
-      await client.connection.db.admin().ping();
-      return true;
-    } catch (error) {
-      console.error('MongoDB health check failed:', error);
-      return false;
-    }
-  },
-};

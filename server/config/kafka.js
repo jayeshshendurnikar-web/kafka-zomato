@@ -102,14 +102,3 @@ export const ensureKafkaTopics = async (definitions) => {
     await admin.disconnect();
   }
 };
-
-// Preserve the original public helper names for existing callers.
-export const connectKafka = connectKafkaProducer;
-export async function disconnectKafka() {
-  const results = await Promise.allSettled([
-    disconnectKafkaProducer(),
-    ...[...consumers].map(stopKafkaConsumer),
-  ]);
-  const failure = results.find((result) => result.status === 'rejected');
-  if (failure) throw failure.reason;
-}
