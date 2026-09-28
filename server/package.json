@@ -15,8 +15,9 @@
     "start": "node server.js",
     "dev": "node scripts/dev.js",
     "dev:api": "node --watch server.js",
-    "dev:worker": "node --watch worker.js",
-    "worker": "node worker.js",
+    "dev:worker": "node --watch consumer/worker.js",
+    "worker": "node consumer/worker.js",
+
     "topics": "node scripts/create-topics.js",
     "token": "node scripts/create-token.js",
     "test": "node --test test/*.test.js",

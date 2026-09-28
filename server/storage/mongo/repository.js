@@ -1,4 +1,4 @@
-import { logActivity } from '../lib/activity.js';
+import { logActivity } from '../../lib/activity.js';
 
 export function createLocationRepository(model, activity = logActivity) {
   return {

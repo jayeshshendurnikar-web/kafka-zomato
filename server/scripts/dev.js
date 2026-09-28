@@ -43,7 +43,8 @@ const setup = launch(['scripts/create-topics.js']);
 const code = await new Promise((resolve) => setup.once('exit', resolve));
 if (code !== 0) stop(1);
 else if (!closing) {
-  const processes = [launch(['--watch', 'worker.js']), launch(['--watch', 'server.js'])];
+  const processes = [launch(['--watch', 'consumer/worker.js']), launch(['--watch', 'server.js'])];
+
   if (process.argv.includes('--client')) {
     processes.push(launch(['node_modules/vite/bin/vite.js'], clientDirectory));
   }

@@ -21,14 +21,8 @@ const connectWithRetry = async (config, retries = 0) => {
     mongoClient = await mongoose.connect(config.uri, config.options);
   } catch (error) {
     if (retries < (config.maxRetries || 3)) {
-      console.warn(
-        `MongoDB connection failed, retrying (${retries + 1}/${
-          config.maxRetries
-        })...`,
-      );
-      await new Promise((resolve) =>
-        setTimeout(resolve, config.retryDelay || 1000),
-      );
+      console.warn(`MongoDB connection failed, retrying (${retries + 1}/${config.maxRetries})...`);
+      await new Promise((resolve) => setTimeout(resolve, config.retryDelay || 1000));
       return connectWithRetry(config, retries + 1);
     }
     throw error;
@@ -50,9 +44,9 @@ export const connectDB = async () => {
   mongoose.connection.on('connected', () => {
     const endTime = new Date();
     console.log(
-      `MongoDB connected in ${Number(
-        (endTime.getTime() - startTime.getTime()) / 1000,
-      ).toFixed(2)}s`,
+      `MongoDB connected in ${Number((endTime.getTime() - startTime.getTime()) / 1000).toFixed(
+        2,
+      )}s`,
     );
   });
 
@@ -95,4 +89,3 @@ export const getMongoClient = () => {
   }
   return mongoClient;
 };
-

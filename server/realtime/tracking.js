@@ -1,6 +1,6 @@
 import { Server } from 'socket.io';
-import { locationChannel } from '../location/store.js';
-import { validateId } from '../location/validation.js';
+import { locationChannel } from '../storage/redis/store.js';
+import { validateId } from '../api/validation.js';
 import { logActivity } from '../lib/activity.js';
 
 // Each process subscribes only to orders with local customers. No global fan-out or double broadcast.

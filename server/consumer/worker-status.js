@@ -1,6 +1,6 @@
 const LEASE_MS = 15000;
 
-// Each worker has its own lease, so shutting down one instance cannot hide another.
+// Worker Lease Status: Each worker has its own lease in Redis, so shutting down one instance cannot hide another.
 export function createWorkerStatus(redis, groupId) {
   const key = `tracking:workers:${groupId}`;
   return {

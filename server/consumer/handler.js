@@ -1,7 +1,8 @@
-import { validateLocation } from './validation.js';
+import { validateLocation } from '../api/validation.js';
 import { logActivity } from '../lib/activity.js';
 
-// Core Worker Message Handler: Processes raw Kafka events, persists to Mongo, updates Redis cache, and triggers live pub/sub
+// Core Consumer Message Handler:
+// Consumes raw Kafka events, persists latest location to MongoDB, updates Redis cache & pub/sub
 export function createLocationHandler({
   store,
   repository,

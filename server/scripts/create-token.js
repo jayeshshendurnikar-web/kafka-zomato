@@ -1,6 +1,6 @@
 import { config } from '../config/index.js';
 import { issueToken } from '../auth/tokens.js';
-import { validateId } from '../location/validation.js';
+import { validateId } from '../api/validation.js';
 
 const [role, orderId, riderId] = process.argv.slice(2);
 if (!['rider', 'customer'].includes(role) || config.auth.secret.length < 32) {

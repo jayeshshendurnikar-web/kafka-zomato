@@ -60,15 +60,14 @@ React rider → POST API → Kafka (key = orderId) → consumer worker
 client/src/components/   React forms, map and location display
 client/src/hooks/        React lifecycle and subscription ownership
 client/src/lib/          Reusable API, rider and customer tracking functions
-server/config/          Existing configuration and connection helpers
-server/producer/        Reusable Kafka publish helpers
-server/consumer/        Reusable Kafka consumer runner
-server/location/        Validation, limiter, Mongo model/repository, Redis store and worker status
-server/realtime/        Socket.IO ↔ per-order Redis subscriptions
-server/auth/            Order/role-scoped signed tracking tokens
-server/app.js           Injectable Express app, without process startup
-server/server.js        API + WebSocket process
-server/worker.js        Independent Kafka consumer process
+server/api/              Express app, validation and rate limiter
+server/producer/         Kafka producer and location publish service
+server/consumer/         Kafka consumer runner, message handler, worker process and status
+server/storage/          MongoDB (model, repository) and Redis (store, Lua scripts)
+server/realtime/         Socket.IO ↔ per-order Redis subscriptions
+server/config/           Database, Kafka, Redis and app configurations
+server/auth/             Order/role-scoped signed tracking tokens
+server/server.js         API + WebSocket process entrypoint
 ```
 
 ## API

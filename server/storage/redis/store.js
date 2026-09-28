@@ -1,8 +1,9 @@
-import { logActivity } from '../lib/activity.js';
+import { logActivity } from '../../lib/activity.js';
+
 export const locationKey = (orderId) => `tracking:{${orderId}}:latest`;
 export const locationChannel = (orderId) => `tracking:{${orderId}}:updates`;
 
-// Compare + cache + publish in ONE Redis operation. Duplicate Kafka deliveries are harmless.
+// Compare + cache + publish in ONE atomic Redis Lua operation. Duplicate Kafka deliveries are harmless.
 export const SAVE_LOCATION_SCRIPT = `
 local previous = redis.call('GET', KEYS[1])
 if previous and tonumber(cjson.decode(previous).timestamp) >= tonumber(ARGV[1]) then
