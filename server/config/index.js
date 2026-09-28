@@ -12,7 +12,7 @@ const positiveInteger = (name, fallback) => {
 
 export const config = {
   port: positiveInteger('PORT', 5000),
-  host: process.env.HOST || '127.0.0.1',
+  host: process.env.HOST || '0.0.0.0',
   mongoUri: process.env.MONGODB_URI,
   kafka: {
     clientId: process.env.KAFKA_CLIENT_ID || 'kafka-practice-server-zomato',
@@ -24,6 +24,14 @@ export const config = {
     locationGroup: process.env.KAFKA_LOCATION_GROUP || 'location-cache-v1',
     partitions: positiveInteger('KAFKA_PARTITIONS', 6),
     replicationFactor: positiveInteger('KAFKA_REPLICATION_FACTOR', 1),
+    ssl: process.env.KAFKA_SSL === 'true' || Boolean(process.env.KAFKA_SASL_USERNAME),
+    sasl: process.env.KAFKA_SASL_USERNAME
+      ? {
+          mechanism: process.env.KAFKA_SASL_MECHANISM || 'scram-sha-256',
+          username: process.env.KAFKA_SASL_USERNAME,
+          password: process.env.KAFKA_SASL_PASSWORD,
+        }
+      : undefined,
   },
   redisUrl: process.env.REDIS_URL || 'redis://127.0.0.1:6379',
   location: {
@@ -39,9 +47,16 @@ export const config = {
 };
 
 export function validateRuntimeConfig() {
-  if (config.auth.demo && process.env.NODE_ENV === 'production') {
-    throw new Error('DEMO_MODE is disabled in production');
+  if (
+    config.auth.demo &&
+    process.env.NODE_ENV === 'production' &&
+    process.env.ALLOW_PROD_DEMO !== 'true'
+  ) {
+    throw new Error(
+      'DEMO_MODE is disabled in production (set ALLOW_PROD_DEMO=true if intentional)',
+    );
   }
+
   if (!config.auth.demo && config.auth.secret.length < 32) {
     throw new Error(
       'Set TRACKING_TOKEN_SECRET (at least 32 characters), or DEMO_MODE=true locally',

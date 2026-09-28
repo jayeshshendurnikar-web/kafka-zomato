@@ -5,7 +5,16 @@ import { logActivity } from '../lib/activity.js';
 
 // Each process subscribes only to orders with local customers. No global fan-out or double broadcast.
 export function attachTrackingServer(httpServer, { subscriber, authorize, logger = console }) {
-  const io = new Server(httpServer, { transports: ['websocket'], maxHttpBufferSize: 4096 });
+  const io = new Server(httpServer, {
+    cors: {
+      origin: process.env.CLIENT_ORIGIN || '*',
+      methods: ['GET', 'POST'],
+      credentials: true,
+    },
+    transports: ['websocket'],
+    maxHttpBufferSize: 4096,
+  });
+
   const subscriptions = new Map();
   const queues = new Map();
   const roomFor = (orderId) => `order:${orderId}`;

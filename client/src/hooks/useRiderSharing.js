@@ -10,13 +10,15 @@ export function useRiderSharing(session, minIntervalMs) {
       return;
     }
     setStatus('Starting location sharing…');
+    const apiUrl = import.meta.env.VITE_API_URL?.replace(/\/$/, '') || '';
     const publisher = createRiderPublisher({
-      api: createApi({ token: session.token }),
+      api: createApi({ token: session.token, baseUrl: apiUrl }),
       orderId: session.orderId,
       riderId: session.riderId,
       intervalMs: Math.max(4000, minIntervalMs),
       onStatus: setStatus,
     });
+
     publisher.start(session.source === 'demo' ? createDemoRoute() : getGpsPosition);
     return () => publisher.stop();
   }, [session, minIntervalMs]);

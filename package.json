@@ -11,8 +11,9 @@
     "test": "npm --prefix server test",
     "test:integration": "npm --prefix server run test:integration",
     "test:browser": "node --test tests/browser.test.mjs",
-    "format": "prettier --write client/src server/{server.js,api,auth,config,consumer,kafka,lib,producer,realtime,scripts,storage,test} tests README.md"
+    "format": "prettier --write client/src server/{server.js,api,auth,config,consumer,kafka,lib,producer,realtime,scripts,storage} README.md"
   },
+
 
   "engines": {
     "node": ">=22.12"

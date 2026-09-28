@@ -15,7 +15,8 @@ export default function App() {
 
   useEffect(() => {
     const controller = new AbortController();
-    fetch('/api/config', { signal: controller.signal })
+    const apiUrl = import.meta.env.VITE_API_URL?.replace(/\/$/, '') || '';
+    fetch(`${apiUrl}/api/config`, { signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error('Could not load settings. Refresh to retry.');
         setSettings(await response.json());

@@ -5,9 +5,11 @@ export const kafka = new Kafka({
   clientId: config.kafka.clientId,
   brokers: config.kafka.brokers,
   logLevel: logLevel.WARN,
-  connectionTimeout: 5000,
-  requestTimeout: 10000,
+  connectionTimeout: 10000,
+  requestTimeout: 25000,
   retry: { retries: 8 },
+  ...(config.kafka.ssl ? { ssl: { rejectUnauthorized: false } } : {}),
+  ...(config.kafka.sasl ? { sasl: config.kafka.sasl } : {}),
 });
 
 let producer;

@@ -15,6 +15,17 @@ export function createApp({
   const app = express();
   app.disable('x-powered-by');
 
+  // CORS support for Vercel or external clients
+  app.use((request, response, next) => {
+    const origin = request.headers.origin;
+    response.setHeader('Access-Control-Allow-Origin', origin || '*');
+    response.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    response.setHeader('Access-Control-Allow-Credentials', 'true');
+    if (request.method === 'OPTIONS') return response.sendStatus(204);
+    next();
+  });
+
   // Request latency and completion logging
   app.use((request, response, next) => {
     const started = Date.now();

@@ -14,7 +14,8 @@ export function useCustomerTracking(session) {
       return;
     }
     const { orderId, token } = session;
-    const socket = io({
+    const apiUrl = import.meta.env.VITE_API_URL?.replace(/\/$/, '') || undefined;
+    const socket = io(apiUrl, {
       transports: ['websocket'],
       autoConnect: false,
       auth: { orderId, token },
@@ -22,11 +23,12 @@ export function useCustomerTracking(session) {
     });
     const tracker = createCustomerTracker({
       socket,
-      api: createApi({ token }),
+      api: createApi({ token, baseUrl: apiUrl || '' }),
       orderId,
       onLocation: setLocation,
       onStatus: setStatus,
     });
+
     tracker.start();
     return () => tracker.stop();
   }, [session]);

@@ -13,10 +13,12 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "start:prod": "node scripts/start-prod.js",
     "dev": "node scripts/dev.js",
     "dev:api": "node --watch server.js",
     "dev:worker": "node --watch consumer/worker.js",
     "worker": "node consumer/worker.js",
+
 
     "topics": "node scripts/create-topics.js",
     "token": "node scripts/create-token.js",
