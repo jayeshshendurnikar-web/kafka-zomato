@@ -14,6 +14,8 @@
   "scripts": {
     "start": "node server.js",
     "start:prod": "node scripts/start-prod.js",
+    "build": "echo 'No build step required for server'",
+
     "dev": "node scripts/dev.js",
     "dev:api": "node --watch server.js",
     "dev:worker": "node --watch consumer/worker.js",
