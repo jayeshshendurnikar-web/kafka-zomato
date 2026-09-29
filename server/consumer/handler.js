@@ -6,6 +6,7 @@ import { logActivity } from '../lib/activity.js';
 export function createLocationHandler({
   store,
   repository,
+  batcher,
   locationConfig,
   activity = logActivity,
 }) {
@@ -34,13 +35,20 @@ export function createLocationHandler({
       if (!isStale) {
         // Runs Lua script: compares existing cached timestamp -> sets latest key -> publishes to channel
         saved = await store.saveIfNewer(location);
+        console.log(
+          `⚡ [REDIS LIVE] Broadcasted live via WebSocket for Order: ${location.orderId}`
+        );
       } else {
         // Stale Backlog Check: archived in Mongo later, but NOT republished as a live point
         activity('worker.location.expired_for_live', { ...location, offset, partition });
       }
 
-      // Step 2: Persist to MongoDB (Durable storage & persistence)
-      await repository.saveIfNewer(location);
+      // Step 2: Persist to MongoDB (Micro-batch buffer: flushes every 20 events or 5 seconds)
+      if (batcher) {
+        batcher.add(location);
+      } else {
+        await repository.saveIfNewer(location);
+      }
 
       // Log successful consumption and processing with full coordinates
       activity('worker.location.processed', {
@@ -55,6 +63,7 @@ export function createLocationHandler({
       });
 
       return saved;
+      
     } catch (error) {
       // Edge Case 4: Storage or Network Failure
       // Throwing error here prevents Kafka offset commit. Kafka will re-deliver the message.

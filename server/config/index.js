@@ -39,6 +39,8 @@ export const config = {
     maxAgeMs: positiveInteger('LOCATION_MAX_AGE_MS', 300000),
     maxFutureMs: positiveInteger('LOCATION_MAX_FUTURE_MS', 30000),
     minIntervalMs: positiveInteger('LOCATION_MIN_INTERVAL_MS', 3000),
+    batchSize: positiveInteger('LOCATION_BATCH_SIZE', 20),
+    batchIntervalMs: positiveInteger('LOCATION_BATCH_INTERVAL_MS', 30000),
   },
   auth: {
     demo: process.env.DEMO_MODE === 'true',

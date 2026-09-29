@@ -11,6 +11,7 @@ import { installShutdown } from '../lib/lifecycle.js';
 import { connectDB, disconnectDB, getMongoClient } from '../config/db.js';
 import { getLocationModel } from '../storage/mongo/model.js';
 import { createLocationRepository } from '../storage/mongo/repository.js';
+import { createLocationBatcher } from './batcher.js';
 import { createWorkerStatus } from './worker-status.js';
 import { logActivity } from '../lib/activity.js';
 
@@ -19,6 +20,7 @@ validateRuntimeConfig();
 const redis = createRedisClient('worker');
 let consumer;
 let heartbeat;
+let batcher;
 let consuming = false;
 const workerId = randomUUID();
 const status = createWorkerStatus(redis, GROUPS.LOCATION_CACHE);
@@ -28,6 +30,7 @@ const shutdown = installShutdown(async () => {
   clearInterval(heartbeat);
   await status.remove(workerId).catch(() => {});
   await stopKafkaConsumer(consumer);
+  if (batcher) await batcher.stop().catch(() => {});
   await Promise.all([closeRedis(redis), disconnectDB()]);
 });
 
@@ -43,11 +46,19 @@ try {
     collection: model.collection.collectionName,
   });
 
+  const repository = createLocationRepository(model);
+  batcher = createLocationBatcher({
+    repository,
+    batchSize: config.location.batchSize,
+    flushIntervalMs: config.location.batchIntervalMs,
+  });
+
   // Start Kafka consumer group runner with our message handler
   consumer = await startConsumer(
     createLocationHandler({
       store: createLocationStore(redis, config.location),
-      repository: createLocationRepository(model),
+      repository,
+      batcher,
       locationConfig: config.location,
     }),
     { topic: TOPICS.RIDER_LOCATION, groupId: GROUPS.LOCATION_CACHE, fromBeginning: true },
