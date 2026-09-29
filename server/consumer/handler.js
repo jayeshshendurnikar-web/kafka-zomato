@@ -27,21 +27,20 @@ export function createLocationHandler({
     }
 
     try {
-      // Step 1: Persist to MongoDB (Idempotent upsert with timestamp check)
-      // Even if Redis was previously written during a failed attempt, Mongo write must be retried
-      await repository.saveIfNewer(location);
+      // Step 1: Atomic Redis Update & Pub/Sub (Real-time live map updates for customer)
+      let saved = false;
+      const isStale = location.timestamp < Date.now() - locationConfig.maxAgeMs;
 
-      // Edge Case 3: Stale Backlog Check
-      // If the location is older than maxAgeMs (default 5 minutes), it is archived in Mongo,
-      // but NOT republished to Redis or WebSockets as a live point.
-      if (location.timestamp < Date.now() - locationConfig.maxAgeMs) {
+      if (!isStale) {
+        // Runs Lua script: compares existing cached timestamp -> sets latest key -> publishes to channel
+        saved = await store.saveIfNewer(location);
+      } else {
+        // Stale Backlog Check: archived in Mongo later, but NOT republished as a live point
         activity('worker.location.expired_for_live', { ...location, offset, partition });
-        return false;
       }
 
-      // Step 2: Atomic Redis Update & Pub/Sub
-      // Runs Lua script: compares existing cached timestamp -> sets latest key -> publishes to channel
-      const saved = await store.saveIfNewer(location);
+      // Step 2: Persist to MongoDB (Durable storage & persistence)
+      await repository.saveIfNewer(location);
 
       // Log successful consumption and processing with full coordinates
       activity('worker.location.processed', {
